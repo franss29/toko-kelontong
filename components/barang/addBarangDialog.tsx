@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,9 +13,9 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { createBarang } from "@/utils/api"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface AddBarangDialogProps {
   open: boolean
@@ -32,6 +31,9 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
     kategori: "",
     harga: "",
     stok: "",
+    supplier: "",
+    alamat: "",
+    nomor_hp: "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +69,9 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
           kategori: "",
           harga: "",
           stok: "",
+          supplier: "",
+          alamat: "",
+          nomor_hp: "",
         })
       } else {
         toast.error(result.message || "Gagal menambahkan barang")
@@ -102,7 +107,7 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="nama" className="text-right">
-                Nama
+                Nama Barang
               </Label>
               <Input
                 id="nama"
@@ -152,6 +157,46 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 name="stok"
                 type="number"
                 value={formData.stok}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="supplier" className="text-right">
+                Nama Supplier
+              </Label>
+              <Input
+                id="supplier"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="alamat" className="text-right">
+                Alamat
+              </Label>
+              <Input
+                id="alamat"
+                name="alamat"
+                value={formData.alamat}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="nomor_hp" className="text-right">
+                Nomor HP
+              </Label>
+              <Input
+                id="nomor_hp"
+                name="nomor_hp"
+                type="tel"
+                value={formData.nomor_hp}
                 onChange={handleChange}
                 className="col-span-3"
                 required

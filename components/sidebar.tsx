@@ -25,7 +25,7 @@ export function Sidebar() {
         <div className="flex h-14 items-center border-b px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <Package className="h-6 w-6" />
-            <span>Toko ATK Sejahtera</span>
+            <span>Toko Rara</span>
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2">
@@ -44,10 +44,10 @@ export function Sidebar() {
               href="/dashboard"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
-                pathname === "/dashboard" ? "bg-muted text-primary" : "text-muted-foreground",
+                pathname === "/laporan" ? "bg-muted text-primary" : "text-muted-foreground",
               )}
             >
-              <Home className="h-4 w-4" />
+              <FileText className="h-4 w-4" />
               Dashboard
             </Link>
             <Link
@@ -69,16 +69,6 @@ export function Sidebar() {
             >
               <ShoppingCart className="h-4 w-4" />
               Transaksi Penjualan
-            </Link>
-            <Link
-              href="/laporan"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
-                pathname === "/laporan" ? "bg-muted text-primary" : "text-muted-foreground",
-              )}
-            >
-              <FileText className="h-4 w-4" />
-              Laporan
             </Link>
             <Link
               href="/pengaturan"

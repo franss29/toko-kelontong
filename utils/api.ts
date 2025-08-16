@@ -1,48 +1,82 @@
-// Definisi tipe data untuk barang
-export interface Barang {
+export type Barang = {
   id: string;
   kode: string;
   nama: string;
   kategori: string;
   harga: string;
   stok: string;
-  created_at?: string;
+  supplier: string;
+  alamat: string;
+  nomor_hp: string;
+};
+
+// Tambahkan kode berikut di akhir file utils/api.ts
+
+// Deklarasikan API_URL di sini atau impor dari file konfigurasi
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost/toko-kelontong-api/api/";
+
+// Fungsi helper untuk handle response
+async function handleResponse(response: Response) {
+  const contentType = response.headers.get("content-type");
+
+  if (!response.ok) {
+    console.error(`HTTP Error: ${response.status} ${response.statusText}`);
+
+    if (contentType && contentType.includes("application/json")) {
+      try {
+        const errorData = await response.json();
+        return {
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      } catch {
+        return {
+          message: `HTTP Error: ${response.status} ${response.statusText}`,
+        };
+      }
+    } else {
+      const textResponse = await response.text();
+      console.error("Non-JSON response:", textResponse);
+      return { message: `Server Error: ${response.status}` };
+    }
+  }
+
+  if (contentType && contentType.includes("application/json")) {
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error("JSON Parse Error:", error);
+      const textResponse = await response.text();
+      console.error("Raw response:", textResponse);
+      return { message: "Invalid JSON response from server" };
+    }
+  } else {
+    const textResponse = await response.text();
+    console.error("Non-JSON response:", textResponse);
+    return { message: "Server returned non-JSON response" };
+  }
 }
 
-// Ubah URL API ke lokasi yang benar
-const API_URL = "http://localhost/toko-kelontong-api/api";
-
+// Fungsi untuk mengambil data barang
 export async function fetchBarang(): Promise<Barang[]> {
   try {
-    console.log("Fetching data from:", `${API_URL}/barang/read.php`);
+    console.log("Fetching barang from:", `${API_URL}/barang/read.php`);
 
-    const response = await fetch(`${API_URL}/barang/read.php`);
-    console.log("Response status:", response.status);
+    const response = await fetch(`${API_URL}/barang/read.php`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const data = await handleResponse(response);
 
-    const responseText = await response.text();
-    console.log("Response text:", responseText);
-
-    // Coba parse respons sebagai JSON
-    try {
-      const data = JSON.parse(responseText);
-      console.log("Parsed data:", data);
-
-      // Periksa apakah data memiliki format yang benar
-      if (data.records) {
-        return data.records;
-      } else if (data.message) {
-        console.log("Message from API:", data.message);
-        return [];
-      } else {
-        console.error("Unexpected data format:", data);
-        return [];
-      }
-    } catch (e) {
-      console.error("Failed to parse JSON:", e);
+    if (data.records) {
+      return data.records;
+    } else if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.error("Unexpected data format:", data);
       return [];
     }
   } catch (error) {
@@ -51,148 +85,190 @@ export async function fetchBarang(): Promise<Barang[]> {
   }
 }
 
-export async function getBarangById(id: string): Promise<Barang | null> {
-  try {
-    const response = await fetch(`${API_URL}/barang/read_one.php?id=${id}`);
-    return await response.json();
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Gagal mengambil detail barang:", error.message);
-    } else {
-      console.error("Gagal mengambil detail barang:", error);
-    }
-    return null;
-  }
-}
-
+// Fungsi untuk membuat barang baru
 export async function createBarang(
-  barangData: Omit<Barang, "id" | "created_at">
-) {
+  barang: Omit<Barang, "id">
+): Promise<{ message: string }> {
   try {
-    console.log("Mengirim data ke API:", barangData);
+    console.log("Creating barang:", barang);
+    console.log("API URL:", `${API_URL}/barang/create.php`);
+
     const response = await fetch(`${API_URL}/barang/create.php`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(barangData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(barang),
     });
 
-    console.log("Status respons:", response.status);
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
 
-    try {
-      const data = await response.json();
-      console.log("Respons data:", data);
-      return data;
-    } catch (e) {
-      const text = await response.text();
-      console.log("Respons text:", text);
-      return { message: text || "Terjadi kesalahan saat menambahkan barang" };
-    }
+    return await handleResponse(response);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Gagal membuat barang:", error.message);
-    } else {
-      console.error("Gagal membuat barang:", error);
-    }
-    return { message: "Terjadi kesalahan saat menambahkan barang" };
+    console.error("Gagal membuat barang:", error);
+    return {
+      message:
+        "Terjadi kesalahan saat membuat barang: " +
+        (error instanceof Error ? error.message : String(error)),
+    };
   }
 }
 
-export async function updateBarang(barangData: Barang) {
+// Fungsi untuk memperbarui data barang
+export async function updateBarang(
+  barang: Barang
+): Promise<{ message: string }> {
   try {
-    console.log("Mengirim data update ke API:", barangData);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    console.log("Updating barang:", barang);
 
     const response = await fetch(`${API_URL}/barang/update.php`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(barangData),
-      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(barang),
     });
 
-    clearTimeout(timeoutId);
-    console.log("Status respons update:", response.status);
-
-    try {
-      const data = await response.json();
-      console.log("Respons data update:", data);
-      return data;
-    } catch (e) {
-      const text = await response.text();
-      console.log("Respons text update:", text);
-      return { message: text || "Terjadi kesalahan saat memperbarui barang" };
-    }
+    return await handleResponse(response);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Gagal memperbarui barang:", error.message);
-      if (error.name === "AbortError") {
-        return {
-          message: "Timeout: Permintaan memperbarui barang terlalu lama",
-        };
-      }
-    } else {
-      console.error("Gagal memperbarui barang:", error);
-    }
-    return { message: "Terjadi kesalahan saat memperbarui barang" };
+    console.error("Gagal memperbarui barang:", error);
+    return {
+      message:
+        "Terjadi kesalahan saat memperbarui barang: " +
+        (error instanceof Error ? error.message : String(error)),
+    };
   }
 }
 
-export async function deleteBarang(id: string) {
+// Fungsi untuk menghapus barang
+export async function deleteBarang(id: string): Promise<{ message: string }> {
   try {
-    console.log("Mengirim permintaan hapus ke API untuk ID:", id);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    console.log("Deleting barang ID:", id);
 
     const response = await fetch(`${API_URL}/barang/delete.php`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ id }),
-      signal: controller.signal,
     });
 
-    clearTimeout(timeoutId);
-    console.log("Status respons delete:", response.status);
-
-    try {
-      const data = await response.json();
-      console.log("Respons data delete:", data);
-      return data;
-    } catch (e) {
-      const text = await response.text();
-      console.log("Respons text delete:", text);
-      return { message: text || "Terjadi kesalahan saat menghapus barang" };
-    }
+    return await handleResponse(response);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Gagal menghapus barang:", error.message);
-      if (error.name === "AbortError") {
-        return { message: "Timeout: Permintaan menghapus barang terlalu lama" };
-      }
-    } else {
-      console.error("Gagal menghapus barang:", error);
-    }
-    return { message: "Terjadi kesalahan saat menghapus barang" };
+    console.error("Gagal menghapus barang:", error);
+    return {
+      message:
+        "Terjadi kesalahan saat menghapus barang: " +
+        (error instanceof Error ? error.message : String(error)),
+    };
   }
 }
 
-export async function searchBarang(query: string): Promise<Barang[]> {
+// Fungsi untuk mencari barang
+export async function searchBarang(searchTerm: string): Promise<Barang[]> {
   try {
-    const response = await fetch(`${API_URL}/barang/search.php?s=${query}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.records || [];
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Gagal mencari barang:", error.message);
+    console.log("Searching barang:", searchTerm);
+
+    const response = await fetch(
+      `${API_URL}/barang/search.php?s=${encodeURIComponent(searchTerm)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await handleResponse(response);
+
+    if (data.records) {
+      return data.records;
+    } else if (Array.isArray(data)) {
+      return data;
     } else {
-      console.error("Gagal mencari barang:", error);
+      console.error("Unexpected search data format:", data);
+      return [];
     }
+  } catch (error) {
+    console.error("Gagal mencari barang:", error);
     return [];
   }
 }
 
+// Tambahkan interface untuk transaksi
+export interface Transaction {
+  items: {
+    id: string;
+    kode: string;
+    nama: string;
+    harga: number;
+    qty: number;
+    total: number;
+  }[];
+  total: number;
+  customer?: string;
+  payment_method?: string;
+  notes?: string;
+}
 
+// Tambahkan fungsi saveTransaction yang hilang
+export async function saveTransaction(
+  transaction: Transaction
+): Promise<{ message: string; id?: number }> {
+  try {
+    console.log("Saving transaction:", transaction);
+
+    const response = await fetch(`${API_URL}/transaksi/create.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(transaction),
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    console.error("Gagal menyimpan transaksi:", error);
+    return {
+      message:
+        "Terjadi kesalahan saat menyimpan transaksi: " +
+        (error instanceof Error ? error.message : String(error)),
+    };
+  }
+}
+
+// Interface untuk Supplier
+export interface Supplier {
+  id?: string;
+  nama: string;
+  email: string;
+  nomor_hp: string;
+  minimal_stok: string;
+}
+
+// Fungsi untuk membuat supplier baru
+export async function createSupplier(
+  supplier: Omit<Supplier, "id">
+): Promise<{ message: string }> {
+  try {
+    console.log("Creating supplier:", supplier);
+
+    const response = await fetch(`${API_URL}/supplier/create.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(supplier),
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    console.error("Gagal membuat supplier:", error);
+    return {
+      message:
+        "Terjadi kesalahan saat membuat supplier: " +
+        (error instanceof Error ? error.message : String(error)),
+    };
+  }
+}

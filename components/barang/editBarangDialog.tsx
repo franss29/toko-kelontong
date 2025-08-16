@@ -34,6 +34,9 @@ export function EditBarangDialog({ open, onOpenChange, barang, onSuccess }: Edit
     kategori: "",
     harga: "",
     stok: "",
+    supplier: "",
+    alamat: "",
+    nomor_hp: "",
   })
 
   useEffect(() => {
@@ -45,6 +48,9 @@ export function EditBarangDialog({ open, onOpenChange, barang, onSuccess }: Edit
         kategori: barang.kategori || "",
         harga: barang.harga || "",
         stok: barang.stok || "",
+        supplier: barang.supplier || "",
+        alamat: barang.alamat || "",
+        nomor_hp: barang.nomor_hp || "",
       })
     }
   }, [barang])
@@ -165,6 +171,46 @@ export function EditBarangDialog({ open, onOpenChange, barang, onSuccess }: Edit
                 name="stok"
                 type="number"
                 value={formData.stok}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="supplier" className="text-right">
+                Nama Supplier
+              </Label>
+              <Input
+                id="supplier"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="alamat" className="text-right">
+                Alamat
+              </Label>
+              <Input
+                id="alamat"
+                name="alamat"
+                value={formData.alamat}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="nomor_hp" className="text-right">
+                Nomor HP
+              </Label>
+              <Input
+                id="nomor_hp"
+                name="nomor_hp"
+                type="tel"
+                value={formData.nomor_hp}
                 onChange={handleChange}
                 className="col-span-3"
                 required

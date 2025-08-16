@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AddBarangDialog } from "@/components/barang/add-barang-dialog"
-import { EditBarangDialog } from "@/components/barang/edit-barang-dialog"
+import  {AddBarangDialog}  from "@/components/barang/addBarangDialog"
+import  {EditBarangDialog}  from "@/components/barang/editBarangDialog"
 import { fetchBarang, deleteBarang, searchBarang, type Barang } from "@/utils/api"
 import { toast } from "sonner"
 
@@ -167,13 +167,16 @@ export default function BarangPage() {
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
+                  <TableHead>Supplier</TableHead>
+                  <TableHead>Alamat</TableHead>
+                  <TableHead>Nomor HP</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10">
+                    <TableCell colSpan={9} className="text-center py-10">
                       <div className="flex justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                       </div>
@@ -182,7 +185,7 @@ export default function BarangPage() {
                   </TableRow>
                 ) : barangList.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10">
+                    <TableCell colSpan={9} className="text-center py-10">
                       Tidak ada data barang
                     </TableCell>
                   </TableRow>
@@ -203,6 +206,9 @@ export default function BarangPage() {
                           {barang.stok}
                         </Badge>
                       </TableCell>
+                      <TableCell>{barang.supplier}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{barang.alamat}</TableCell>
+                      <TableCell>{barang.nomor_hp}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(barang)}>
