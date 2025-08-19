@@ -2,19 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronDown, FileText, Home, Package, Search, Settings, ShoppingCart, User } from "lucide-react"
+import { Home, Package, Search, Settings, ShoppingCart, User } from "lucide-react"
+import { UserNav } from "@/components/user-nav"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -44,10 +36,10 @@ export function Sidebar() {
               href="/dashboard"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
-                pathname === "/laporan" ? "bg-muted text-primary" : "text-muted-foreground",
+                pathname === "/dashboard" ? "bg-muted text-primary" : "text-muted-foreground",
               )}
             >
-              <FileText className="h-4 w-4" />
+              <Home className="h-4 w-4" />
               Dashboard
             </Link>
             <Link
@@ -93,22 +85,7 @@ export function Sidebar() {
                 admin@example.com
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <ChevronDown className="h-4 w-4" />
-                  <span className="sr-only">Menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profil</DropdownMenuItem>
-                <DropdownMenuItem>Pengaturan</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Keluar</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserNav />
           </div>
         </div>
       </div>
