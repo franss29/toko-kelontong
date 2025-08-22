@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import  {AddBarangDialog}  from "@/components/barang/addBarangDialog"
-import  {EditBarangDialog}  from "@/components/barang/editBarangDialog"
-import { fetchBarang, deleteBarang, searchBarang, type Barang } from "@/utils/api"
+import { AddBarangDialog } from "@/components/barang/addBarangDialog"
+import { EditBarangDialog } from "@/components/barang/editBarangDialog"
+import { fetchBarang, deleteBarang, type Barang } from "@/utils/api"
 import { toast } from "sonner"
 
 export default function BarangPage() {
@@ -46,23 +46,18 @@ export default function BarangPage() {
   }, [])
 
   // Fungsi untuk menangani pencarian
-  const handleSearch = async () => {
-    if (searchQuery.trim() === "") {
-      loadBarang()
-      return
+    const handleSearch = () => {
+      if (searchQuery.trim() === "") {
+        loadBarang()
+        return
+      }
+
+      const filtered = barangList.filter((barang) =>
+        barang.nama.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setBarangList(filtered)
     }
 
-    setIsLoading(true)
-    try {
-      const results = await searchBarang(searchQuery)
-      setBarangList(results)
-    } catch (error) {
-      console.error("Error searching barang:", error)
-      toast.error("Gagal mencari data barang")
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   // Fungsi untuk menangani edit barang
   const handleEdit = (barang: Barang) => {
@@ -199,12 +194,7 @@ export default function BarangPage() {
                       </TableCell>
                       <TableCell>Rp {Number.parseInt(barang.harga).toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={Number.parseInt(barang.stok) < 10 ? "text-red-500 border-red-500" : ""}
-                        >
-                          {barang.stok}
-                        </Badge>
+                        <Badge variant="outline">{barang.stok}</Badge>
                       </TableCell>
                       <TableCell>{barang.supplier}</TableCell>
                       <TableCell className="max-w-[150px] truncate">{barang.alamat}</TableCell>

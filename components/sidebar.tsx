@@ -53,16 +53,6 @@ export function Sidebar() {
               Data Barang
             </Link>
             <Link
-              href="/transaksi"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
-                pathname === "/transaksi" ? "bg-muted text-primary" : "text-muted-foreground",
-              )}
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Transaksi Penjualan
-            </Link>
-            <Link
               href="/pengaturan"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
