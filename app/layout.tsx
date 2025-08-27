@@ -3,8 +3,8 @@ import type { Metadata } from "next"
 import ClientLayout from "./ClientLayout"
 
 export const metadata: Metadata = {
-  title: "Toko Kelontong Dashboard",
-  description: "Dashboard aplikasi toko kelontong",
+  title: "Toko Rara Dashboard",
+  description: "Dashboard aplikasi toko rara",
 }
 
 export default function RootLayout({

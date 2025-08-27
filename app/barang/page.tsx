@@ -46,18 +46,17 @@ export default function BarangPage() {
   }, [])
 
   // Fungsi untuk menangani pencarian
-    const handleSearch = () => {
-      if (searchQuery.trim() === "") {
-        loadBarang()
-        return
-      }
-
-      const filtered = barangList.filter((barang) =>
-        barang.nama.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      setBarangList(filtered)
+  const handleSearch = () => {
+    if (searchQuery.trim() === "") {
+      loadBarang()
+      return
     }
 
+    const filtered = barangList.filter((barang) =>
+      barang.nama.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    setBarangList(filtered)
+  }
 
   // Fungsi untuk menangani edit barang
   const handleEdit = (barang: Barang) => {
@@ -80,6 +79,21 @@ export default function BarangPage() {
         console.error("Error deleting barang:", error)
         toast.error("Terjadi kesalahan saat menghapus barang")
       }
+    }
+  }
+
+  // Fungsi cek stok sesuai kategori
+  const isLowStock = (barang: Barang) => {
+    const stok = Number(barang.stok)
+    switch (barang.kategori) {
+      case "ATK":
+        return stok < 6
+      case "Alat Tulis":
+        return stok < 12
+      case "Buku":
+        return stok < 24
+      default: // Lainnya
+        return stok < 2
     }
   }
 
@@ -194,7 +208,12 @@ export default function BarangPage() {
                       </TableCell>
                       <TableCell>Rp {Number.parseInt(barang.harga).toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{barang.stok}</Badge>
+                        <Badge
+                          variant="outline"
+                          className={isLowStock(barang) ? "bg-red-500 text-white" : ""}
+                        >
+                          {barang.stok}
+                        </Badge>
                       </TableCell>
                       <TableCell>{barang.supplier}</TableCell>
                       <TableCell className="max-w-[150px] truncate">{barang.alamat}</TableCell>

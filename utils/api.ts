@@ -192,20 +192,16 @@ export interface Supplier {
 }
 
 export async function fetchLaporanSupplier() {
-  try {
-    const res = await fetch(`${API_URL}/laporan_supplier/read.php`);
-    const data: any = await handleResponse(res);
-    if (data.records) return data.records;
-    return [];
-  } catch (err) {
-    console.error("Gagal ambil laporan supplier:", err);
-    return [];
+  const response = await fetch(`${API_URL}/laporan_supplier/read.php`);
+  if (!response.ok) {
+    throw new Error("Gagal fetch laporan supplier");
   }
+  return response.json();
 }
 
 export async function getSuppliers(): Promise<Supplier[]> {
   try {
-    const response = await fetch(`${API_URL}/supplier/read.php`);
+    const response = await fetch(`${API_URL}/laporan_supplier/read.php`);
     const data: any = await handleResponse(response);
 
     if (data.records) return data.records;
@@ -283,5 +279,32 @@ export async function deleteLaporanSupplier(
         "Terjadi kesalahan saat menghapus laporan supplier: " +
         (error instanceof Error ? error.message : String(error)),
     };
+  }
+}
+
+export async function createBarangKeluar(data: any) {
+  try {
+    const response = await fetch("/api/barang_keluar/create.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("API createBarangKeluar error:", error);
+    return { success: false, message: "Gagal terhubung ke server" };
+  }
+}
+
+export async function getBarangKeluar() {
+  try {
+    const response = await fetch(`${API_URL}/barang_keluar/read.php`);
+    return await response.json();
+  } catch (error) {
+    console.error("API getBarangKeluar error:", error);
+    return [];
   }
 }
