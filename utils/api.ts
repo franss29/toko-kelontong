@@ -282,29 +282,97 @@ export async function deleteLaporanSupplier(
   }
 }
 
-export async function createBarangKeluar(data: any) {
-  try {
-    const response = await fetch("/api/barang_keluar/create.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+export async function getBarangKeluar() {
+  const res = await fetch(`${API_URL}/barang_keluar/read.php`);
+  return res.json();
+}
 
-    return await response.json();
-  } catch (error) {
-    console.error("API createBarangKeluar error:", error);
-    return { success: false, message: "Gagal terhubung ke server" };
+export async function createBarangKeluar(data: any) {
+  const res = await fetch(`${API_URL}/barang_keluar/create.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+
+  const json = await res.text(); // ambil dulu sebagai text
+  try {
+    return JSON.parse(json); // parse JSON
+  } catch {
+    console.error("Response bukan JSON:", json);
+    throw new Error("Response dari server bukan JSON");
   }
 }
 
-export async function getBarangKeluar() {
-  try {
-    const response = await fetch(`${API_URL}/barang_keluar/read.php`);
-    return await response.json();
-  } catch (error) {
-    console.error("API getBarangKeluar error:", error);
-    return [];
+export async function deleteBarangKeluar(id: number) {
+  const res = await fetch(`${API_URL}/barang_keluar/delete.php?id=${id}`, {
+    method: "DELETE",
+  });
+  return res.json();
+}
+
+export async function getBarangMasuk() {
+  const res = await fetch(`${API_URL}/barang_masuk/read.php`);
+  return res.json();
+}
+
+export async function createBarangMasuk(data: any) {
+  const res = await fetch(`${API_URL}/barang_masuk/create.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function updateBarangMasuk(id: number, data: any) {
+  const res = await fetch(`${API_URL}/barang_masuk/update.php`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...data }),
+  });
+  return res.json();
+}
+
+export async function deleteBarangMasuk(id: number) {
+  const res = await fetch(`${API_URL}/barang_masuk/delete.php`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  return res.json();
+}
+
+export async function createBarangKeluarSafe(data: any) {
+  const res = await fetch(`${API_URL}/barang_keluar/create.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
   }
+
+  const text = await res.text();
+  try {
+    return text
+      ? JSON.parse(text)
+      : { success: false, message: "Response kosong" };
+  } catch (err) {
+    console.error("Gagal parsing JSON:", text);
+    return { success: false, message: "Response bukan JSON valid" };
+  }
+}
+
+export async function updateBarangKeluar(id: number, data: any) {
+  const res = await fetch(`${API_URL}/barang_keluar/update.php?id=${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
 }

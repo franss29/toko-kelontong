@@ -13,32 +13,29 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { createBarangKeluar, updateBarangKeluar } from "@/utils/api"
+import { createBarangMasuk, updateBarangMasuk } from "@/utils/api"
 
-interface InputBarangKeluarDialogProps {
+interface InputBarangMasukDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
   editData?: any | null
-  barangMasukData?: any[]
 }
 
-export function InputBarangKeluarDialog({
+export function InputBarangMasukDialog({
   open,
   onOpenChange,
   onSuccess,
   editData,
-  barangMasukData = [],
-}: InputBarangKeluarDialogProps) {
+}: InputBarangMasukDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     nama_barang: "",
     tanggal: new Date().toISOString().split("T")[0],
     total_item: "",
-    harga_jual: "",
+    harga_beli: "",
   })
 
-  // isi otomatis jika edit
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -47,19 +44,19 @@ export function InputBarangKeluarDialog({
           ? new Date(editData.tanggal).toISOString().split("T")[0]
           : new Date().toISOString().split("T")[0],
         total_item: String(editData.total_item || ""),
-        harga_jual: String(editData.harga_jual || ""),
+        harga_beli: String(editData.harga_beli || ""),
       })
     } else {
       setFormData({
         nama_barang: "",
         tanggal: new Date().toISOString().split("T")[0],
         total_item: "",
-        harga_jual: "",
+        harga_beli: "",
       })
     }
   }, [editData, open])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -77,49 +74,37 @@ export function InputBarangKeluarDialog({
         toast.error("Total item harus lebih dari 0")
         return
       }
-      if (!formData.harga_jual || Number.parseFloat(formData.harga_jual) <= 0) {
-        toast.error("Harga jual harus lebih dari 0")
-        return
-      }
-
-      // cari barang yang dipilih dari dropdown
-      const selectedBarang = barangMasukData.find(b => b.nama_barang === formData.nama_barang)
-      if (!selectedBarang) {
-        toast.error("Barang tidak ditemukan")
+      if (!formData.harga_beli || Number.parseFloat(formData.harga_beli) <= 0) {
+        toast.error("Harga beli harus lebih dari 0")
         return
       }
 
       const payload = {
-        nama_barang: selectedBarang.nama_barang,
-        total_item: Number(formData.total_item),
-        harga_jual: Number(formData.harga_jual),
-        tanggal: formData.tanggal,
-        barang_masuk_id: selectedBarang.id,
+        ...formData,
+        total_item: Number.parseInt(formData.total_item),
+        harga_beli: Number.parseFloat(formData.harga_beli),
       }
 
       let result
       if (editData?.id) {
-        result = await updateBarangKeluar(editData.id, payload)
+        result = await updateBarangMasuk(editData.id, payload)
       } else {
-        result = await createBarangKeluar(payload)
+        result = await createBarangMasuk(payload)
       }
 
       if (result.success) {
-        toast.success(result.message || (editData ? "Barang keluar berhasil diperbarui" : "Barang keluar berhasil ditambahkan"))
+        toast.success(
+          result.message ||
+            (editData ? "Barang masuk berhasil diperbarui" : "Barang masuk berhasil ditambahkan")
+        )
         onSuccess?.()
         onOpenChange(false)
-        setFormData({
-          nama_barang: "",
-          tanggal: new Date().toISOString().split("T")[0],
-          total_item: "",
-          harga_jual: "",
-        })
       } else {
-        toast.error(result.message || "Gagal menyimpan barang keluar")
+        toast.error(result.message || "Gagal menyimpan barang masuk")
       }
     } catch (error) {
-      console.error("Error saving barang keluar:", error)
-      toast.error("Terjadi kesalahan saat menyimpan barang keluar")
+      console.error("Error saving barang masuk:", error)
+      toast.error("Terjadi kesalahan saat menyimpan barang masuk")
     } finally {
       setIsLoading(false)
     }
@@ -129,14 +114,19 @@ export function InputBarangKeluarDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Barang Keluar" : "Input Barang Keluar"}</DialogTitle>
+          <DialogTitle>
+            {editData ? "Edit Barang Masuk" : "Input Barang Masuk"}
+          </DialogTitle>
           <DialogDescription>
-            {editData ? "Ubah informasi barang keluar." : "Masukkan informasi barang keluar. ID transaksi akan dibuat otomatis."}
+            {editData
+              ? "Ubah informasi barang masuk."
+              : "Masukkan informasi barang masuk."}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {/* Tanggal */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="tanggal" className="text-right">Tanggal *</Label>
               <Input
@@ -150,25 +140,21 @@ export function InputBarangKeluarDialog({
               />
             </div>
 
+            {/* Nama Barang */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="nama_barang" className="text-right">Nama Barang *</Label>
-              <select
+              <Input
                 id="nama_barang"
                 name="nama_barang"
+                type="text"
                 value={formData.nama_barang}
                 onChange={handleChange}
-                className="col-span-3 border rounded px-2 py-1"
+                className="col-span-3"
                 required
-              >
-                <option value="">-- Pilih Barang --</option>
-                {barangMasukData.map(item => (
-                  <option key={item.id} value={item.nama_barang}>
-                    {item.nama_barang} (Stok: {item.total_item})
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
+            {/* Total Item */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="total_item" className="text-right">Total Item *</Label>
               <Input
@@ -183,14 +169,15 @@ export function InputBarangKeluarDialog({
               />
             </div>
 
+            {/* Harga Beli */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="harga_jual" className="text-right">Harga Jual *</Label>
+              <Label htmlFor="harga_beli" className="text-right">Harga Beli *</Label>
               <Input
-                id="harga_jual"
-                name="harga_jual"
+                id="harga_beli"
+                name="harga_beli"
                 type="number"
                 min="0"
-                value={formData.harga_jual}
+                value={formData.harga_beli}
                 onChange={handleChange}
                 className="col-span-3"
                 required
