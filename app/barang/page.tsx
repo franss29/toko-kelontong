@@ -210,7 +210,7 @@ export default function BarangPage() {
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className={isLowStock(barang) ? "bg-red-500 text-white" : ""}
+                          
                         >
                           {barang.stok}
                         </Badge>

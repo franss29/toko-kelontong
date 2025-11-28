@@ -38,7 +38,7 @@ export function InputBarangKeluarDialog({
     harga_jual: "",
   })
 
-  // isi otomatis jika edit
+  // Isi otomatis jika edit
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -82,7 +82,7 @@ export function InputBarangKeluarDialog({
         return
       }
 
-      // cari barang yang dipilih dari dropdown
+      // Cari barang yang dipilih dari dropdown
       const selectedBarang = barangMasukData.find(b => b.nama_barang === formData.nama_barang)
       if (!selectedBarang) {
         toast.error("Barang tidak ditemukan")
@@ -152,21 +152,32 @@ export function InputBarangKeluarDialog({
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="nama_barang" className="text-right">Nama Barang *</Label>
-              <select
-                id="nama_barang"
-                name="nama_barang"
-                value={formData.nama_barang}
-                onChange={handleChange}
-                className="col-span-3 border rounded px-2 py-1"
-                required
-              >
-                <option value="">-- Pilih Barang --</option>
-                {barangMasukData.map(item => (
-                  <option key={item.id} value={item.nama_barang}>
-                    {item.nama_barang} (Stok: {item.total_item})
-                  </option>
-                ))}
-              </select>
+              <div className="col-span-3 flex items-center gap-2">
+                <select
+                  id="nama_barang"
+                  name="nama_barang"
+                  value={formData.nama_barang}
+                  onChange={handleChange}
+                  className="flex-1 border rounded px-2 py-1"
+                  required
+                >
+                  <option value="">-- Pilih Barang --</option>
+                  {barangMasukData.map(item => (
+                    <option key={item.id} value={item.nama_barang}>
+                      {item.nama_barang}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Badge stok */}
+                {formData.nama_barang && (
+                  <span className="px-2 py-1 text-sm rounded bg-gray-100 border">
+                    Stok: {
+                      barangMasukData.find(b => b.nama_barang === formData.nama_barang)?.total_item ?? 0
+                    }
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4">

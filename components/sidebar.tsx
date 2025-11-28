@@ -62,6 +62,16 @@ export function Sidebar() {
               <Settings className="h-4 w-4" />
               Pengaturan
             </Link>
+            <Link
+              href="/keranjang"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
+                pathname === "/keranjang" ? "bg-muted text-primary" : "text-muted-foreground",
+              )}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Keranjang
+            </Link>
           </nav>
         </div>
         <div className="mt-auto p-4">

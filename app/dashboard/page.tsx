@@ -15,6 +15,7 @@ import { fetchBarang, getSuppliers, getBarangKeluar, deleteBarangKeluar, getBara
 import * as XLSX from "xlsx"
 import { Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
 
 export default function LaporanPage() {
   const [supplierData, setSupplierData] = useState<any[]>([])
@@ -80,6 +81,21 @@ export default function LaporanPage() {
   const filteredBarangMasuk = barangMasukData.filter(trx =>
     trx.nama_barang?.toLowerCase().includes(search.toLowerCase())
   )
+
+  // Fungsi cek stok sesuai kategori
+  const isLowStock = (barang: any) => {
+    const stok = Number(barang.total_item) // atau barang.stok kalau ada
+    switch (barang.kategori) {
+      case "ATK":
+        return stok < 6
+      case "Alat Tulis":
+        return stok < 12
+      case "Buku":
+        return stok < 24
+      default: // Lainnya
+        return stok < 2
+    }
+  }
 
   // === EXPORT EXCEL ===
   const exportToExcelSupplier = () => {
@@ -218,7 +234,7 @@ export default function LaporanPage() {
                           <Button size="sm" variant="outline" onClick={() => { setEditData(trx); setOpenDialogBarangKeluar(true) }}>
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={async () => {
+                          <Button size="sm" variant="outline" onClick={async () => {
                             if (!confirm("Yakin ingin menghapus data ini?")) return
                             try {
                               const result = await deleteBarangKeluar(trx.id)
@@ -264,7 +280,13 @@ export default function LaporanPage() {
             <CardContent>
               <div className="relative mb-4">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search" placeholder="Cari barang..." className="pl-8 w-[250px]" value={search} onChange={e => setSearch(e.target.value)} />
+                <Input
+                  type="search"
+                  placeholder="Cari barang..."
+                  className="pl-8 w-[250px]"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
               </div>
               <div className="rounded-md border">
                 <Table>
@@ -272,6 +294,7 @@ export default function LaporanPage() {
                     <TableRow>
                       <TableHead>No</TableHead>
                       <TableHead>Nama Barang</TableHead>
+                      <TableHead>Kategori</TableHead>
                       <TableHead>Total Item</TableHead>
                       <TableHead>Harga Beli</TableHead>
                       <TableHead>Aksi</TableHead>
@@ -282,13 +305,20 @@ export default function LaporanPage() {
                       <TableRow key={trx.id}>
                         <TableCell>{idx + 1}</TableCell>
                         <TableCell>{trx.nama_barang}</TableCell>
-                        <TableCell>{trx.total_item}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{trx.kategori || "-"}</Badge>
+                        </TableCell>
+                        <TableCell >
+                          <Badge className={isLowStock(trx) ? "bg-red-500 text-white " : ""} variant="outline">
+                            {trx.total_item}
+                          </Badge>
+                        </TableCell>
                         <TableCell>Rp {trx.harga_beli}</TableCell>
                         <TableCell className="flex gap-2">
                           <Button size="sm" variant="outline" onClick={() => { setEditMasukData(trx); setOpenDialogBarangMasuk(true) }}>
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={async () => {
+                          <Button size="sm" variant="outline" onClick={async () => {
                             if (!confirm("Yakin ingin menghapus data ini?")) return
                             try {
                               const result = await deleteBarangMasuk(trx.id)
@@ -304,7 +334,7 @@ export default function LaporanPage() {
                       </TableRow>
                     )) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center">Tidak ada data</TableCell>
+                        <TableCell colSpan={6} className="text-center">Tidak ada data</TableCell>
                       </TableRow>
                     )}
                   </TableBody>

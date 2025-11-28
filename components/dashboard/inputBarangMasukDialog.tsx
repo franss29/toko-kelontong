@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { createBarangMasuk, updateBarangMasuk } from "@/utils/api"
 
@@ -31,6 +32,7 @@ export function InputBarangMasukDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     nama_barang: "",
+    kategori: "",
     tanggal: new Date().toISOString().split("T")[0],
     total_item: "",
     harga_beli: "",
@@ -40,6 +42,7 @@ export function InputBarangMasukDialog({
     if (editData) {
       setFormData({
         nama_barang: editData.nama_barang || "",
+        kategori: editData.kategori || "",
         tanggal: editData.tanggal
           ? new Date(editData.tanggal).toISOString().split("T")[0]
           : new Date().toISOString().split("T")[0],
@@ -49,6 +52,7 @@ export function InputBarangMasukDialog({
     } else {
       setFormData({
         nama_barang: "",
+        kategori: "",
         tanggal: new Date().toISOString().split("T")[0],
         total_item: "",
         harga_beli: "",
@@ -61,6 +65,10 @@ export function InputBarangMasukDialog({
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleSelectChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, kategori: value }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -68,6 +76,10 @@ export function InputBarangMasukDialog({
     try {
       if (!formData.nama_barang.trim()) {
         toast.error("Nama barang wajib diisi")
+        return
+      }
+      if (!formData.kategori) {
+        toast.error("Kategori wajib dipilih")
         return
       }
       if (!formData.total_item || Number.parseInt(formData.total_item) <= 0) {
@@ -152,6 +164,22 @@ export function InputBarangMasukDialog({
                 className="col-span-3"
                 required
               />
+            </div>
+
+            {/* Kategori */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="kategori" className="text-right">Kategori *</Label>
+              <Select value={formData.kategori} onValueChange={handleSelectChange}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ATK">ATK</SelectItem>
+                  <SelectItem value="Alat Tulis">Alat Tulis</SelectItem>
+                  <SelectItem value="Buku">Buku</SelectItem>
+                  <SelectItem value="Lainnya">Lainnya</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Total Item */}

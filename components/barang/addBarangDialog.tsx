@@ -85,15 +85,16 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Tambah Barang Baru</DialogTitle>
           <DialogDescription>Masukkan informasi barang baru di bawah ini.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="kode" className="text-right">
+            {/* Kode */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="kode" className="col-span-4 text-right">
                 Kode
               </Label>
               <Input
@@ -101,12 +102,13 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 name="kode"
                 value={formData.kode}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="nama" className="text-right">
+            {/* Nama Barang */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="nama" className="col-span-4 text-right">
                 Nama Barang
               </Label>
               <Input
@@ -114,16 +116,20 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 name="nama"
                 value={formData.nama}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="kategori" className="text-right">
+            {/* Kategori */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="kategori" className="col-span-4 text-right">
                 Kategori
               </Label>
-              <Select value={formData.kategori} onValueChange={(value) => handleSelectChange("kategori", value)}>
-                <SelectTrigger className="col-span-3">
+              <Select
+                value={formData.kategori}
+                onValueChange={(value) => handleSelectChange("kategori", value)}
+              >
+                <SelectTrigger className="col-span-8">
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -134,8 +140,9 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="harga" className="text-right">
+            {/* Harga */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="harga" className="col-span-4 text-right">
                 Harga
               </Label>
               <Input
@@ -144,12 +151,13 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 type="number"
                 value={formData.harga}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="stok" className="text-right">
+            {/* Stok */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="stok" className="col-span-4 text-right">
                 Stok
               </Label>
               <Input
@@ -158,12 +166,13 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 type="number"
                 value={formData.stok}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="supplier" className="text-right">
+            {/* Nama Supplier */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="supplier" className="col-span-4 text-right">
                 Nama Supplier
               </Label>
               <Input
@@ -171,12 +180,13 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 name="supplier"
                 value={formData.supplier}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="alamat" className="text-right">
+            {/* Alamat */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="alamat" className="col-span-4 text-right">
                 Alamat
               </Label>
               <Input
@@ -184,12 +194,13 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 name="alamat"
                 value={formData.alamat}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="nomor_hp" className="text-right">
+            {/* Nomor HP */}
+            <div className="grid grid-cols-12 items-center gap-4">
+              <Label htmlFor="nomor_hp" className="col-span-4 text-right">
                 Nomor HP
               </Label>
               <Input
@@ -198,7 +209,7 @@ export function AddBarangDialog({ open, onOpenChange, onSuccess }: AddBarangDial
                 type="tel"
                 value={formData.nomor_hp}
                 onChange={handleChange}
-                className="col-span-3"
+                className="col-span-8"
                 required
               />
             </div>
